@@ -15,6 +15,8 @@ public class Main {
     private static int t_sell;
     private static int t_rollback;
     private static int total;
+    private static int ts;
+    private static int acc_id;
 
     //  private static String mTimestamp = "TIMESTAMP";
     //  private static String mAccountID = "ACCOUNT_ID";
@@ -40,6 +42,7 @@ public class Main {
     private static HashMap<String, ArrayList<String>> map;
     private static HashMap<String, ArrayList<String>> trademap;
     private static HashMap<String, ArrayList<String>> unitmap;
+    private static HashMap<String, ArrayList<String>> branchmap;
 
 
     public static void main(String[] args) {
@@ -52,6 +55,7 @@ public class Main {
         map = new HashMap<>();
         trademap = new HashMap<>();
         unitmap = new HashMap<>();
+        branchmap = new HashMap<>();
         String input[] = new String[n];
         String queries[] = new String[m];
         for (int i = 0; i < n; i++) {
@@ -59,13 +63,6 @@ public class Main {
         }
         for (int i = 0; i < m; i++) {
             queries[i] = scanner.nextLine();
-        }
-
-        for (int i = 0; i < n; i++) {
-            System.out.println(input[i]);
-        }
-        for (int i = 0; i < m; i++) {
-            System.out.println(queries[i]);
         }
 
         //TRANSACTION
@@ -89,7 +86,6 @@ public class Main {
 
                 for (int j = 5; j < str.length; j++) {
                     if (str[j].equalsIgnoreCase(buy)) {
-                        System.out.println(buy);
                         t_buy++;
                         String trade_item = str[++j];
                         arrayList.add(trade_item); //tradeable
@@ -103,7 +99,6 @@ public class Main {
                         //calculate amount
                         arrayList.add("-" + Integer.toString(units * price));
                     } else if (str[j].equalsIgnoreCase(sell)) {
-                        System.out.println(sell);
                         t_sell++;
                         String trade_item = str[++j];
                         arrayList.add(trade_item); //tradeable
@@ -133,12 +128,21 @@ public class Main {
                 map.put(Integer.toString(timestamp), arrayList);
 
                 unitmap.put(Integer.toString(timestamp), unitList);
-                System.out.println("UNIT MAP:");
-                System.out.println(unitmap);
+
 
                 trademap.put(str[1], tradeList);
-                System.out.println("TRADE MAP:");
-                System.out.println(trademap);
+
+            }//Branching
+            else{
+                ts = scanner.nextInt();
+                acc_id = scanner.nextInt();
+                for (String key : map.keySet()) {
+                    if(Integer.parseInt(key)<=ts && (map.get(key)).contains(Integer.toString(acc_id)))
+                    {
+                        branchmap.put(key,map.get(key));
+                    }
+
+                }
             }
         }
 
@@ -197,8 +201,6 @@ public class Main {
             }
 
         }
-
-        System.out.println(map);
     }
 
     /*
@@ -215,24 +217,23 @@ public class Main {
      */
 
     public static void log(int acc_id) {
-        System.out.println("Log function");
         for (String key : map.keySet()) {
             if ((map.get(key)).get(0).equals(Integer.toString(acc_id))) {
-                System.out.print(map.get(key).get(1) + " ");
+
+                 System.out.print(map.get(key).get(1) + " ");
                 System.out.println(key);
             }
         }
     }
 
     public static void log(int acc_id, String tradeable_name) {
-        System.out.println("Log function");
         for (String key : map.keySet()) {
             if ((map.get(key)).get(0).equals(Integer.toString(acc_id))) {
                 int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
                 for (int i = 0; i < total; i++) {
                     String tradable = (map.get(key)).get(3 + i * 2);
                     if (tradable.equalsIgnoreCase(tradeable_name)) {
-                        System.out.print(map.get(key).get(1) + " ");
+                         System.out.print(map.get(key).get(1) + " ");
                         System.out.println(key);
                     }
                 }
@@ -242,73 +243,68 @@ public class Main {
 
 
     public static void position(int account_id, int timestamp) {
-        System.out.println("Position Function");
 
         String trans = "";
+        ArrayList<String> trans_array = new ArrayList<>();
         HashMap<String, ArrayList<Integer>> hashMap = new HashMap<>();
         ArrayList<Integer> itemlist;
 
-        for (String key : map.keySet()) {
-            if (map.get(key).contains(rollback)) {
+        for (String key1 : map.keySet()) {
+            if (map.get(key1).contains(rollback)) {
                 int p = arrayList.indexOf(rollback);
                 trans = arrayList.get(p + 1);
-            }
-        }
-
-        for (String key : unitmap.keySet()) {
-            if ((unitmap.get(key)).get(0).equals(Integer.toString(account_id))
-                    && Integer.valueOf(key) <= timestamp) {
-                if (!unitmap.get(key).contains(trans)) {
-
-                    int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
-                    for (int i=0; i<total; i++){
-                        String tradable = unitmap.get(key).get(2 + i*3);
-                        String trade_unit = unitmap.get(key).get(3 + i*3);
-                        String trade_price = unitmap.get(key).get(4 + i*3);
-                        itemlist= new ArrayList<>();
-                        int int_unit = Integer.parseInt(trade_unit.substring(1));
-                        int int_price = Integer.parseInt(trade_price.substring(1));
-
-                        int map_unit=0;
-                        int map_price=0;
-
-                        if (trade_unit.charAt(0)=='+')//BUY
-                        {
-                            if (hashMap.containsKey(tradable))
-                            {
-                                map_unit = (hashMap.get(tradable).get(0)) + int_unit;
-                                map_price = (hashMap.get(tradable).get(1)) - int_price;
-                            }
-                            else
-                            {
-                                map_unit = int_unit;
-                                map_price = - int_price;
-                            }
-                            itemlist.add(map_unit);
-                            itemlist.add(map_price);
-                        }else if (trade_unit.charAt(0)=='-')//SELL
-                        {
-                            if (hashMap.containsKey(tradable))
-                            {
-                                map_unit = (hashMap.get(tradable).get(0)) - int_unit;
-                                map_price = (hashMap.get(tradable).get(1)) + int_price;
-                            }
-                            else
-                            {
-                                map_unit = - int_unit;
-                                map_price = int_price;
-                            }
-                            itemlist.add(map_unit);
-                            itemlist.add(map_price);
-                        }
-                        hashMap.put(tradable, itemlist);
-
+                trans_array.add(trans);
                     }
+                  }
+
+                for (String key : unitmap.keySet()) {
+                    if ((unitmap.get(key)).get(0).equals(Integer.toString(account_id))
+                            && Integer.valueOf(key) <= timestamp) {
+                        if (!unitmap.get(key).contains(trans)) {
+
+                            int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
+                            for (int i = 0; i < total; i++) {
+                                String tradable = unitmap.get(key).get(2 + i * 3);
+                                String trade_unit = unitmap.get(key).get(3 + i * 3);
+                                String trade_price = unitmap.get(key).get(4 + i * 3);
+                                itemlist = new ArrayList<>();
+                                int int_unit = Integer.parseInt(trade_unit.substring(1));
+                                int int_price = Integer.parseInt(trade_price.substring(1));
+
+                                int map_unit = 0;
+                                int map_price = 0;
+
+                                if (trade_unit.charAt(0) == '+')//BUY
+                                {
+                                    if (hashMap.containsKey(tradable)) {
+                                        map_unit = (hashMap.get(tradable).get(0)) + int_unit;
+                                        map_price = (hashMap.get(tradable).get(1)) - int_price;
+                                    } else {
+                                        map_unit = int_unit;
+                                        map_price = -int_price;
+                                    }
+                                    itemlist.add(map_unit);
+                                    itemlist.add(map_price);
+                                } else if (trade_unit.charAt(0) == '-')//SELL
+                                {
+                                    if (hashMap.containsKey(tradable)) {
+                                        map_unit = (hashMap.get(tradable).get(0)) - int_unit;
+                                        map_price = (hashMap.get(tradable).get(1)) + int_price;
+                                    } else {
+                                        map_unit = -int_unit;
+                                        map_price = int_price;
+                                    }
+                                    itemlist.add(map_unit);
+                                    itemlist.add(map_price);
+                                }
+                                hashMap.put(tradable, itemlist);
+
+                            }
 
 
+                        }
+                    }
                 }
-            }
-        }
 
         for (String key : hashMap.keySet()){
             System.out.print(key+" ");
@@ -326,8 +322,6 @@ public class Main {
 
 
     public static void mVolatile(int account_id, int timestamp1, int timestamp2) {
-
-        System.out.println("Volatile Function");
         HashMap<String, Integer> hashMap = new HashMap<>();
 
         for (String key : map.keySet()) {
@@ -387,18 +381,14 @@ public class Main {
                 }
             }
         }
-        System.out.println("Triage Function");
         String result[][] = new String[count][2];
         int i = 0;
         for (String key : transmap.keySet()) {
             result[i][0] = transmap.get(key).get(0).toString();
-            System.out.println(result[i][0]);
             result[i][1] = transmap.get(key).get(1).toString();
-            System.out.println(result[i][1]);
             i++;
 
         }
-        System.out.println(transmap);
         for (int j = result.length - 1; j >= result.length - k; j--) {
             System.out.print(result[j][0] + " ");
             System.out.println(result[j][1]);
@@ -407,7 +397,6 @@ public class Main {
 
     public static void merge(int acc_id1, int acc_id2) {
 
-        System.out.println("Merge Function");
 
         String trans = "";
         HashMap<String, ArrayList<Integer>> hashMap = new HashMap<>();
