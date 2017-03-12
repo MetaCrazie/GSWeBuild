@@ -102,6 +102,7 @@ public class Main {
                     }
 
                 }
+                total = t_buy + t_sell;
                 tradeList.add(Integer.toString(t_buy));
                 tradeList.add(Integer.toString(t_sell));
                 tradeList.add(Integer.toString(t_rollback));
@@ -200,7 +201,7 @@ public class Main {
         for (String key : map.keySet()) {
             if ((map.get(key)).get(0).equals(Integer.toString(acc_id))) {
                 int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
-                for(int i=0; i< total; i++) {
+                for (int i = 0; i < total; i++) {
                     String tradable = (map.get(key)).get(3 + i * 2);
                     if (tradable.equalsIgnoreCase(tradeable_name)) {
                         System.out.print(map.get(key).get(1) + " ");
@@ -213,9 +214,10 @@ public class Main {
 
 
     public static void position(int account_id, int timestamp) {
-
-        for (String key : map.keySet()){
-            if ((map.get(key)).get(0).equals(Integer.toString(account_id)) && Integer.valueOf(key)<=timestamp){
+        HashMap<String, ArrayList> hashMap = new HashMap<>();
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (String key : map.keySet()) {
+            if ((map.get(key)).get(0).equals(Integer.toString(account_id)) && Integer.valueOf(key) <= timestamp) {
                 int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
 
             }
@@ -224,32 +226,46 @@ public class Main {
 
 
     public static void mVolatile(int account_id, int timestamp1, int timestamp2) {
-        HashMap<String, ArrayList> volmap=new HashMap<>();
-        ArrayList<Integer> vollist = new ArrayList<>();
+
+        System.out.println("Volatile Function");
+        HashMap<String, Integer> hashMap = new HashMap<>();
+
         for (String key : map.keySet()) {
             if ((map.get(key)).get(0).equals(Integer.toString(account_id))
                     && Integer.valueOf(key) >= timestamp1
                     && Integer.valueOf(key) <= timestamp2) {
                 int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
-                vollist.add(total);
+                for (int i = 0; i < total; i++) {
+                    String tradable = (map.get(key)).get(3 + i * 2);
+                    String adder = map.get(key).get(4 + i * 2);
+                    int amount = 0;
+                    int req = Integer.parseInt(adder.substring(1));
+                    if (adder.charAt(0)=='+'){
+                        if (hashMap.containsKey(tradable))
+                            amount = hashMap.get(tradable) + req;
+                        else
+                            amount = req;
+                    }else if (adder.charAt(0)=='-'){
+                        if (hashMap.containsKey(tradable))
+                            amount = hashMap.get(tradable) - req;
+                        else
+                            amount = -req;
+                    }
+                    hashMap.put(tradable, amount);
+                }
             }
         }
-        Integer i = Collections.max(vollist);
-        for (String key : map.keySet()) {
-            if((trademap.get(key).get(3).equals(Integer.toString(i))))
-            {
-                System.out.println(	(map.get(key)).get(3) );
-            }
-        }
+        for (String key : hashMap.keySet()){
+            System.out.print(key+" ");
+        }System.out.println();
+
 
     }
 
 
-
-
     public static void triage(int k, int acc_id, String tradeable_name, int timestamp1, int timestamp2) {
 
-        HashMap<String, ArrayList> transmap=new HashMap<>();
+        HashMap<String, ArrayList> transmap = new HashMap<>();
         ArrayList<String> translist;
         int count = 0;
         for (String key : map.keySet()) {
@@ -257,38 +273,39 @@ public class Main {
                     && Integer.valueOf(key) >= timestamp1
                     && Integer.valueOf(key) <= timestamp2) {
                 int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
-                 for(int i=0; i< total; i++){
-                     String tradable = (map.get(key)).get(3 + i*2);
-                     if (tradable.equalsIgnoreCase(tradeable_name)){
-                         translist= new ArrayList<>();
-                         translist.add(map.get(key).get(2));
-                         translist.add(map.get(key).get(1));
-                         String trans_key= (map.get(key).get(4 + i*2)).substring(1);
-                         transmap.put(trans_key, translist);
-                         count++;
-                     }
-                 }
+                for (int i = 0; i < total; i++) {
+                    String tradable = (map.get(key)).get(3 + i * 2);
+                    if (tradable.equalsIgnoreCase(tradeable_name)) {
+                        translist = new ArrayList<>();
+                        translist.add(map.get(key).get(2));
+                        translist.add(map.get(key).get(1));
+                        String trans_key = (map.get(key).get(4 + i * 2)).substring(1);
+                        transmap.put(trans_key, translist);
+                        count++;
+                    }
+                }
             }
         }
         System.out.println("Triage Function");
-        String result[][]= new String[count][2];
-        int i=0;
-        for (String key : transmap.keySet()){
-            result[i][0]= transmap.get(key).get(0).toString();
+        String result[][] = new String[count][2];
+        int i = 0;
+        for (String key : transmap.keySet()) {
+            result[i][0] = transmap.get(key).get(0).toString();
             System.out.println(result[i][0]);
-            result[i][1]= transmap.get(key).get(1).toString();
+            result[i][1] = transmap.get(key).get(1).toString();
             System.out.println(result[i][1]);
             i++;
 
         }
         System.out.println(transmap);
-        for (int j=result.length-1; j>=result.length-k; j--){
-            System.out.print(result[j][0]+" ");
+        for (int j = result.length - 1; j >= result.length - k; j--) {
+            System.out.print(result[j][0] + " ");
             System.out.println(result[j][1]);
         }
     }
 
     public static void merge(int acc_id1, int acc_id2) {
+
 
     }
 
@@ -296,20 +313,19 @@ public class Main {
 
         ArrayList<String> traderlist = new ArrayList<>();
         for (String key : map.keySet()) {
-            if (Integer.valueOf(key) >= timestamp1 && Integer.valueOf(key) <= timestamp2){
+            if (Integer.valueOf(key) >= timestamp1 && Integer.valueOf(key) <= timestamp2) {
                 int rollback = Integer.parseInt(trademap.get(key).get(2));
-                if (rollback!=0) {
+                if (rollback != 0) {
                     traderlist.add(map.get(key).get(2));
                 }
             }
         }
 
         Collections.sort(traderlist);
-        for (int i=0; i<traderlist.size(); i++){
+        for (int i = 0; i < traderlist.size(); i++) {
             System.out.print(traderlist.get(i));
         }
         System.out.println();
     }
-
 
 }
