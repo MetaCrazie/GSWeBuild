@@ -245,6 +245,7 @@ public class Main {
 
         HashMap<String, ArrayList> transmap=new HashMap<>();
         ArrayList<String> translist;
+        int count = 0;
         for (String key : map.keySet()) {
             if ((map.get(key)).get(0).equals(Integer.toString(acc_id))
                     && Integer.valueOf(key) >= timestamp1
@@ -258,20 +259,26 @@ public class Main {
                          translist.add(map.get(key).get(1));
                          String trans_key= (map.get(key).get(4 + i*2)).substring(1);
                          transmap.put(trans_key, translist);
+                         count++;
                      }
                  }
             }
         }
-        String result[][]= new String[transmap.size()][2];
+        System.out.println("Triage Function");
+        String result[][]= new String[count][2];
+        int i=0;
         for (String key : transmap.keySet()){
-            for(int i=0; i< result.length; i++){
-                result[i][0]= transmap.get(key).get(0).toString();
-                result[i][1]= transmap.get(key).get(1).toString();
-            }
-        }
-        for (int i=result.length-1; i>=result.length-k; i--){
-            System.out.print(result[i][0]+" ");
+            result[i][0]= transmap.get(key).get(0).toString();
+            System.out.println(result[i][0]);
+            result[i][1]= transmap.get(key).get(1).toString();
             System.out.println(result[i][1]);
+            i++;
+
+        }
+        System.out.println(transmap);
+        for (int j=result.length-1; j>=result.length-k; j--){
+            System.out.print(result[j][0]+" ");
+            System.out.println(result[j][1]);
         }
     }
 
