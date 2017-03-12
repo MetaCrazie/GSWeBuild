@@ -13,11 +13,11 @@ public class Main {
     private static int t_rollback;
     private static int total;
 
-  //  private static String mTimestamp = "TIMESTAMP";
-  //  private static String mAccountID = "ACCOUNT_ID";
-  //  private static String mTransID = "TRANSACTION_ID";
-  //  private static String mTraderID = "TRADER_ID";
-  //  private static String mTrade = "TRADE";
+    //  private static String mTimestamp = "TIMESTAMP";
+    //  private static String mAccountID = "ACCOUNT_ID";
+    //  private static String mTransID = "TRANSACTION_ID";
+    //  private static String mTraderID = "TRADER_ID";
+    //  private static String mTrade = "TRADE";
 
     private static String buy = "BUY";
     private static String sell = "SELL";
@@ -26,7 +26,7 @@ public class Main {
     private static String q_log = "LOG";
     private static String q_position = "POSITION";
     private static String q_volatile = "VOLATILE";
-    private static String q_triage = "TRAIGE";
+    private static String q_triage = "TRIAGE";
     private static String q_merge = "MERGE";
     private static String q_alert = "ALERT";
 
@@ -43,10 +43,6 @@ public class Main {
         n = scanner.nextInt();
         m = scanner.nextInt();
         scanner.nextLine();
-
-        t_buy=0;
-        t_sell=0;
-        t_rollback=0;
 
         map = new HashMap<>();
         trademap = new HashMap<>();
@@ -68,7 +64,10 @@ public class Main {
 
         //TRANSACTION
         for (int i = 0; i < n; i++) {
-            total=0;
+            total = 0;
+            t_buy = 0;
+            t_sell = 0;
+            t_rollback = 0;
             arrayList = new ArrayList<>();
             tradeList = new ArrayList<>();
             String str[] = input[i].split(" ");
@@ -100,17 +99,16 @@ public class Main {
                         arrayList.add(rollback);
                         arrayList.add(str[++j]); //transaction_ID
                     }
-                    tradeList.add(Integer.toString(t_buy));
-                    tradeList.add(Integer.toString(t_sell));
-                    tradeList.add(Integer.toString(t_rollback));
-                    tradeList.add(Integer.toString(total));
-                }
-                map.put(Integer.toString(timestamp), arrayList);
-                trademap.put(str[2], tradeList);
 
-                System.out.println(map);
+                }
+                tradeList.add(Integer.toString(t_buy));
+                tradeList.add(Integer.toString(t_sell));
+                tradeList.add(Integer.toString(t_rollback));
+                tradeList.add(Integer.toString(total));
+
+                map.put(Integer.toString(timestamp), arrayList);
+                trademap.put(str[1], tradeList);
                 System.out.println(trademap);
-                sorted_map = new TreeMap<>(map);
             }
         }
 
@@ -158,7 +156,7 @@ public class Main {
             if (str[0].equalsIgnoreCase(q_merge)) {
                 int acc_id1 = Integer.parseInt(str[1]);
                 int acc_id2 = Integer.parseInt(str[2]);
-                merge(acc_id1,acc_id2);
+                merge(acc_id1, acc_id2);
             }
 
             //ALERT
@@ -186,22 +184,20 @@ public class Main {
 
      */
 
-    public static void log(int acc_id){
+    public static void log(int acc_id) {
         System.out.println("Log function");
-        for (String key : map.keySet()){
-            if((map.get(key)).get(0).equals(Integer.toString(acc_id)))
-            {
-                System.out.print(map.get(key).get(1)+" ");
+        for (String key : map.keySet()) {
+            if ((map.get(key)).get(0).equals(Integer.toString(acc_id))) {
+                System.out.print(map.get(key).get(1) + " ");
                 System.out.println(key);
             }
         }
     }
 
-    public static void log(int acc_id, String tradeable_name){
-        for (String key : map.keySet()){
-            if((map.get(key)).get(0).equals(Integer.toString(acc_id)) && (map.get(key)).get(3).equals(tradeable_name) )
-            {
-                System.out.print(map.get(key).get(1)+" ");
+    public static void log(int acc_id, String tradeable_name) {
+        for (String key : map.keySet()) {
+            if ((map.get(key)).get(0).equals(Integer.toString(acc_id)) && (map.get(key)).get(3).equals(tradeable_name)) {
+                System.out.print(map.get(key).get(1) + " ");
                 System.out.println(key);
             }
         }
@@ -218,22 +214,19 @@ public class Main {
         ArrayList mArrayList = new ArrayList<>();
         Iterator iterator = map.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry pair = (Map.Entry)iterator.next();
+            Map.Entry pair = (Map.Entry) iterator.next();
 
-            if ((Integer)(pair.getKey())<= timestamp){
-                mArrayList = (ArrayList)pair.getValue();
+            if ((Integer) (pair.getKey()) <= timestamp) {
+                mArrayList = (ArrayList) pair.getValue();
                 int length = mArrayList.size();
-                for(int i=3; i<length; i++){
-                    if (tradeable.containsKey(mArrayList.get(i))){
-                        if (mArrayList.get(i+1).toString().charAt(0)=='+')
-                        {
+                for (int i = 3; i < length; i++) {
+                    if (tradeable.containsKey(mArrayList.get(i))) {
+                        if (mArrayList.get(i + 1).toString().charAt(0) == '+') {
                             //add + values
-                        }
-                        else
-                        {
+                        } else {
                             //add - values
                         }
-                    }else{
+                    } else {
                         //create new key
                     }
                 }
@@ -244,21 +237,49 @@ public class Main {
 
     }
 
-    public static void mVolatile(int account_id,int timestamp1, int timestamp2){
+    public static void mVolatile(int account_id, int timestamp1, int timestamp2) {
 
     }
 
-    public static void triage(int k ,int acc_id,String tradeable_name, int timestamp1, int timestamp2){
+    public static void triage(int k, int acc_id, String tradeable_name, int timestamp1, int timestamp2) {
 
+        HashMap<String, ArrayList> transmap=new HashMap<>();
+        ArrayList<String> translist;
+        for (String key : map.keySet()) {
+            if ((map.get(key)).get(0).equals(Integer.toString(acc_id))
+                    && Integer.valueOf(key) >= timestamp1
+                    && Integer.valueOf(key) <= timestamp2) {
+                int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
+                 for(int i=0; i< total; i++){
+                     String tradable = (map.get(key)).get(3 + i*2);
+                     if (tradable.equalsIgnoreCase(tradeable_name)){
+                         translist= new ArrayList<>();
+                         translist.add(map.get(key).get(2));
+                         translist.add(map.get(key).get(1));
+                         String trans_key= (map.get(key).get(4 + i*2)).substring(1);
+                         transmap.put(trans_key, translist);
+                     }
+                 }
+            }
+        }
+        String result[][]= new String[transmap.size()][2];
+        for (String key : transmap.keySet()){
+            for(int i=0; i< result.length; i++){
+                result[i][0]= transmap.get(key).get(0).toString();
+                result[i][1]= transmap.get(key).get(1).toString();
+            }
+        }
+        for (int i=result.length-1; i>=result.length-k; i--){
+            System.out.print(result[i][0]+" ");
+            System.out.println(result[i][1]);
+        }
+    }
 
+    public static void merge(int acc_id1, int acc_id2) {
 
     }
 
-    public static void merge(int acc_id1, int acc_id2){
-
-    }
-
-    public static void alert(int timestamp1, int timestamp2){
+    public static void alert(int timestamp1, int timestamp2) {
 
 
     }
