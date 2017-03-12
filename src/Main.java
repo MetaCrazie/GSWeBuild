@@ -308,7 +308,7 @@ public class Main {
 
                 }
             }
-        } System.out.println(hashMap);
+        }
 
         for (String key : hashMap.keySet()){
             System.out.print(key+" ");
@@ -406,6 +406,94 @@ public class Main {
     }
 
     public static void merge(int acc_id1, int acc_id2) {
+
+        System.out.println("Merge Function");
+
+        String trans = "";
+        HashMap<String, ArrayList<Integer>> hashMap = new HashMap<>();
+        ArrayList<Integer> itemlist;
+
+        for (String key : map.keySet()) {
+            if (map.get(key).contains(rollback)) {
+                int p = arrayList.indexOf(rollback);
+                trans = arrayList.get(p + 1);
+            }
+        }
+
+        ArrayList<String> keyList = new ArrayList<>();
+
+        for (String key : map.keySet()) {
+            if ((map.get(key)).contains(Integer.toString(acc_id1)) || (map.get(key)).contains(Integer.toString(acc_id2))) {
+                keyList.add(key);
+            }
+        }
+
+        for (String key : keyList) {
+            if ((unitmap.get(key)).get(0).equals(Integer.toString(acc_id1)) ||
+            (unitmap.get(key)).get(0).equals(Integer.toString(acc_id2))) {
+                if (!unitmap.get(key).contains(trans)) {
+
+                    int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
+                    for (int i=0; i<total; i++){
+                        String tradable = unitmap.get(key).get(2 + i*3);
+                        String trade_unit = unitmap.get(key).get(3 + i*3);
+                        String trade_price = unitmap.get(key).get(4 + i*3);
+                        itemlist= new ArrayList<>();
+                        int int_unit = Integer.parseInt(trade_unit.substring(1));
+                        int int_price = Integer.parseInt(trade_price.substring(1));
+
+                        int map_unit=0;
+                        int map_price=0;
+
+                        if (trade_unit.charAt(0)=='+')//BUY
+                        {
+                            if (hashMap.containsKey(tradable))
+                            {
+                                map_unit = (hashMap.get(tradable).get(0)) + int_unit;
+                                map_price = (hashMap.get(tradable).get(1)) - int_price;
+                            }
+                            else
+                            {
+                                map_unit = int_unit;
+                                map_price = - int_price;
+                            }
+                            itemlist.add(map_unit);
+                            itemlist.add(map_price);
+                        }else if (trade_unit.charAt(0)=='-')//SELL
+                        {
+                            if (hashMap.containsKey(tradable))
+                            {
+                                map_unit = (hashMap.get(tradable).get(0)) - int_unit;
+                                map_price = (hashMap.get(tradable).get(1)) + int_price;
+                            }
+                            else
+                            {
+                                map_unit = - int_unit;
+                                map_price = int_price;
+                            }
+                            itemlist.add(map_unit);
+                            itemlist.add(map_price);
+                        }
+                        hashMap.put(tradable, itemlist);
+
+                    }
+
+
+                }
+            }
+        }
+
+        for (String key : hashMap.keySet()){
+            System.out.print(key+" ");
+            if (hashMap.get(key).get(0)>0)
+                System.out.print("(+)"+abs(hashMap.get(key).get(0))+" " );
+            else
+                System.out.print("(-)"+abs(hashMap.get(key).get(0))+" ");
+            if (hashMap.get(key).get(1)>0)
+                System.out.println("(+)"+abs(hashMap.get(key).get(1)) );
+            else
+                System.out.println("(-)"+abs(hashMap.get(key).get(1)));
+        }
 
 
     }
