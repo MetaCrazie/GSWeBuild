@@ -196,10 +196,17 @@ public class Main {
     }
 
     public static void log(int acc_id, String tradeable_name) {
+        System.out.println("Log function");
         for (String key : map.keySet()) {
-            if ((map.get(key)).get(0).equals(Integer.toString(acc_id)) && (map.get(key)).get(3).equals(tradeable_name)) {
-                System.out.print(map.get(key).get(1) + " ");
-                System.out.println(key);
+            if ((map.get(key)).get(0).equals(Integer.toString(acc_id))) {
+                int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
+                for(int i=0; i< total; i++) {
+                    String tradable = (map.get(key)).get(3 + i * 2);
+                    if (tradable.equalsIgnoreCase(tradeable_name)) {
+                        System.out.print(map.get(key).get(1) + " ");
+                        System.out.println(key);
+                    }
+                }
             }
         }
     }
