@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Main {
@@ -206,35 +207,12 @@ public class Main {
 
     public static void position(int account_id, int timestamp) {
 
-        //TODO: OPTIMISE
+        for (String key : map.keySet()){
+            if ((map.get(key)).get(0).equals(Integer.toString(account_id)) && Integer.valueOf(key)<=timestamp){
+                int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
 
-        //instead of hashmap, something else?
-
-        HashMap<String, ArrayList> tradeable = new HashMap<>();
-        ArrayList mArrayList = new ArrayList<>();
-        Iterator iterator = map.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry pair = (Map.Entry) iterator.next();
-
-            if ((Integer) (pair.getKey()) <= timestamp) {
-                mArrayList = (ArrayList) pair.getValue();
-                int length = mArrayList.size();
-                for (int i = 3; i < length; i++) {
-                    if (tradeable.containsKey(mArrayList.get(i))) {
-                        if (mArrayList.get(i + 1).toString().charAt(0) == '+') {
-                            //add + values
-                        } else {
-                            //add - values
-                        }
-                    } else {
-                        //create new key
-                    }
-                }
             }
-
-            iterator.remove();
         }
-
     }
 
     public static void mVolatile(int account_id, int timestamp1, int timestamp2) {
@@ -288,7 +266,21 @@ public class Main {
 
     public static void alert(int timestamp1, int timestamp2) {
 
+        ArrayList<String> traderlist = new ArrayList<>();
+        for (String key : map.keySet()) {
+            if (Integer.valueOf(key) >= timestamp1 && Integer.valueOf(key) <= timestamp2){
+                int rollback = Integer.parseInt(trademap.get(key).get(2));
+                if (rollback!=0) {
+                    traderlist.add(map.get(key).get(2));
+                }
+            }
+        }
 
+        Collections.sort(traderlist);
+        for (int i=0; i<traderlist.size(); i++){
+            System.out.print(traderlist.get(i));
+        }
+        System.out.println();
     }
 
 
