@@ -222,9 +222,30 @@ public class Main {
         }
     }
 
+
     public static void mVolatile(int account_id, int timestamp1, int timestamp2) {
+        HashMap<String, ArrayList> volmap=new HashMap<>();
+        ArrayList<Integer> vollist = new ArrayList<>();
+        for (String key : map.keySet()) {
+            if ((map.get(key)).get(0).equals(Integer.toString(account_id))
+                    && Integer.valueOf(key) >= timestamp1
+                    && Integer.valueOf(key) <= timestamp2) {
+                int total = Integer.parseInt(trademap.get(key).get(0)) + Integer.parseInt(trademap.get(key).get(1));
+                vollist.add(total);
+            }
+        }
+        Integer i = Collections.max(vollist);
+        for (String key : map.keySet()) {
+            if((trademap.get(key).get(3).equals(Integer.toString(i))))
+            {
+                System.out.println(	(map.get(key)).get(3) );
+            }
+        }
 
     }
+
+
+
 
     public static void triage(int k, int acc_id, String tradeable_name, int timestamp1, int timestamp2) {
 
