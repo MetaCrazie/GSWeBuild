@@ -16,7 +16,7 @@ public class Main {
     private static int t_rollback;
     private static int total;
     private static int ts;
-    private static int acc_id;
+    private static String acc_id;
 
     //  private static String mTimestamp = "TIMESTAMP";
     //  private static String mAccountID = "ACCOUNT_ID";
@@ -134,15 +134,17 @@ public class Main {
 
             }//Branching
             else{
-                ts = scanner.nextInt();
-                acc_id = scanner.nextInt();
+                ts = Integer.parseInt(str[1]);
+                acc_id = (str[2]);
                 for (String key : map.keySet()) {
-                    if(Integer.parseInt(key)<=ts && (map.get(key)).contains(Integer.toString(acc_id)))
+                    if(Integer.parseInt(key)<=ts && (map.get(key)).get(0).equals("1"))
                     {
                         branchmap.put(key,map.get(key));
                     }
 
                 }
+                System.out.println("BRANCH");
+                System.out.println(branchmap);
             }
         }
 
@@ -221,6 +223,13 @@ public class Main {
             if ((map.get(key)).get(0).equals(Integer.toString(acc_id))) {
 
                  System.out.print(map.get(key).get(1) + " ");
+                System.out.println(key);
+            }
+        }
+        for (String key : branchmap.keySet()) {
+            if ((branchmap.get(key)).get(0).equals(Integer.toString(acc_id))) {
+
+                System.out.print(branchmap.get(key).get(1) + " ");
                 System.out.println(key);
             }
         }
